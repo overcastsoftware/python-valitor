@@ -1,0 +1,4 @@
+zeep
+pytest
+pytest-env
+sphinx
