@@ -2,3 +2,5 @@ zeep
 pytest
 pytest-env
 sphinx
+coverage
+pytest-cov
