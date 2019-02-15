@@ -6,7 +6,7 @@ from zeep.wsse.username import UsernameToken
 from lxml import etree
 from .errors import ValitorException
 import uuid
-
+from zeep.helpers import serialize_object
 
 class ValitorClient(object):
     
@@ -32,7 +32,7 @@ class ValitorClient(object):
 
         #settings = Settings(xml_huge_tree=True, raw_response=True)
         #self.client = Client(self.WSDL, settings=settings)
-        
+
         self.client = Client(self.WSDL)
 
 
@@ -88,7 +88,7 @@ class ValitorClient(object):
             
         self.check_error(response)
 
-        return response['Kvittun']
+        return serialize_object(response['Kvittun'])
 
 
     def FaEndurgreitt(self, card_number_virtual, amount, currency='ISK'):
@@ -106,7 +106,7 @@ class ValitorClient(object):
             
         self.check_error(response)
 
-        return response['Kvittun']
+        return serialize_object(response['Kvittun'])
 
 
     def UppfaeraGildistima(self, card_number_virtual, valid_until_year, valid_until_month):
