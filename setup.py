@@ -16,7 +16,7 @@ setup(
     long_description=readme,
     author='Sævar Öfjörð Magnússon, Overcast Software',
     author_email='opensource@overcast.is',
-    url='https://github.com/overcastsoftware/valitor_payments',
+    url='https://github.com/overcastsoftware/python-valitor',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )
