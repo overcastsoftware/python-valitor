@@ -47,21 +47,37 @@ def verification_data():
     }
 
 
+@pytest.mark.valitorpay
 def test_can_init_client(credentials):
     valitor = valitor_python.ValitorPayClient(**credentials)
 
 
+@pytest.mark.valitorpay
 def test_create_virtual_card(valitor, creditcard, verification_data):
 
     response = valitor.CreateVirtualCard(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], cardVerificationData=verification_data)
 
     assert response['isSuccess'] == True
     assert 'virtualCard' in response.keys()
-    
 
+
+@pytest.mark.valitorpay
 def test_create_virtual_card_without_verification_data_raises_exception(valitor, creditcard, verification_data):
 
     with pytest.raises(valitor_python.ValitorPayException) as exc_info:
         response = valitor.CreateVirtualCard(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], cardVerificationData=None)
 
-    
+
+@pytest.mark.valitorpay
+def test_card_payment(valitor, creditcard, verification_data):
+
+    response = valitor.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], valitor.CardOperation.Sale, valitor.TransactionType.ECommerce, "ISK", 100, cardVerificationData=verification_data)
+    print(response)
+
+
+@pytest.mark.valitorpay
+def test_virtual_card_payment(valitor, creditcard, verification_data):
+
+    response = valitor.VirtualCardPayment(creditcard['virtual'], "ISK", 100, valitor.VirtualCardOperation.Sale)
+    print(response)
+
