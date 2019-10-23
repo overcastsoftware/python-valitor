@@ -3,3 +3,12 @@ init:
 
 test:
 	pytest -s -v --cov=valitor_python --cov-report=html tests
+
+test_valitor:
+	pytest -s -v -m valitor tests
+
+test_currencies:
+	pytest -s -v -m currencies tests
+
+test_valitorpay:
+	pytest -s -v -m valitorpay tests

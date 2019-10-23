@@ -47,10 +47,12 @@ def valitor(credentials):
     return valitor_python.ValitorClient(**credentials)
 
 
+@pytest.mark.valitor
 def test_can_init_client(credentials):
     valitor = valitor_python.ValitorClient(**credentials)
 
 
+@pytest.mark.valitor
 def test_fa_syndarnumer(valitor, creditcard):
 
     response = valitor.FaSyndarkortnumer(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvv'])
@@ -58,6 +60,7 @@ def test_fa_syndarnumer(valitor, creditcard):
     assert response == creditcard['virtual']
 
 
+@pytest.mark.valitor
 def test_fa_syndarnumer_with_invalid_expiration_raises_exception(valitor, creditcard):
     with pytest.raises(valitor_python.ValitorException) as exc_info:
         response = valitor.FaSyndarkortnumer(creditcard['number'], '00', '00', creditcard['cvv'])
@@ -65,12 +68,14 @@ def test_fa_syndarnumer_with_invalid_expiration_raises_exception(valitor, credit
     assert exc_info.value.number == 232
 
 
+@pytest.mark.valitor
 def test_fa_sidustu_fjora_fra_syndarnumeri(valitor, creditcard):
     response = valitor.FaSidustuFjoraIKortnumeriUtFraSyndarkortnumeri(creditcard['virtual'])
     
     assert response == creditcard['number'][-4:]
 
 
+@pytest.mark.valitor
 def test_fa_sidustu_fjora_fra_syndarnumeri_with_invalid_card_raises_exception(valitor):
     with pytest.raises(valitor_python.ValitorException) as exc_info:
         response = valitor.FaSidustuFjoraIKortnumeriUtFraSyndarkortnumeri('5999991234567890')
@@ -78,6 +83,7 @@ def test_fa_sidustu_fjora_fra_syndarnumeri_with_invalid_card_raises_exception(va
     assert exc_info.value.number == 220
 
 
+@pytest.mark.valitor
 def test_fa_heimild(valitor, creditcard):
     amount = '2990'
     response = valitor.FaHeimild(creditcard['virtual'], amount, 'ISK')
@@ -86,6 +92,7 @@ def test_fa_heimild(valitor, creditcard):
     assert response['Kortnumer'][-4:] == creditcard['number'][-4:]
 
 
+@pytest.mark.valitor
 def test_fa_heimild_with_invalid_card_raises_exception(valitor, creditcard):
     amount = '2990'
 
@@ -95,6 +102,7 @@ def test_fa_heimild_with_invalid_card_raises_exception(valitor, creditcard):
     assert exc_info.value.number == 220
 
 
+@pytest.mark.valitor
 def test_fa_endurgreitt(valitor, creditcard):
     amount = '2990'
     response = valitor.FaEndurgreitt(creditcard['virtual'], amount, 'ISK')
@@ -103,6 +111,7 @@ def test_fa_endurgreitt(valitor, creditcard):
     assert response['Kortnumer'][-4:] == creditcard['number'][-4:]
 
 
+@pytest.mark.valitor
 def test_uppfaera_gildistima_with_invalid_year(valitor, creditcard):
 
     with pytest.raises(valitor_python.ValitorException) as exc_info:
@@ -112,6 +121,7 @@ def test_uppfaera_gildistima_with_invalid_year(valitor, creditcard):
     assert exc_info.value.number == 232
 
 
+@pytest.mark.valitor
 def test_uppfaera_gildistima(valitor, creditcard):
 
     response = valitor.UppfaeraGildistima(creditcard['virtual'], '23', '05')
