@@ -5,3 +5,10 @@ class ValitorException(Exception):
         self.number = number
         self.message = message
         self.log_id = log_id
+
+
+class ValitorPayException(Exception):
+
+    def __init__(self, message):
+        print(message)
+        self.message = message
