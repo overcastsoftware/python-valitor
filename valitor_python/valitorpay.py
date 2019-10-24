@@ -99,14 +99,19 @@ class ValitorPayClient(object):
         return response.json()
 
 
-    def CreateVirtualCard(self, cardNumber, expirationYear, expirationMonth, cvc, subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile.value, cardVerificationData=None):
+    def CreateVirtualCard(self, cardNumber, expirationYear, expirationMonth, cvc, subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardVerificationData=None):
+
+        try:
+            subsequentTransactionType = ValitorPayClient.SubsequentTransactionTypes(subsequentTransactionType)
+        except ValueError:
+            raise ValitorPayException(message=f"Invalid subsequent transaction type '{subsequentTransactionType}'")
 
         payload = {
             "cardNumber": cardNumber,
             "expirationMonth": expirationMonth,
             "expirationYear": expirationYear,
             "cvc": cvc,
-            "subsequentTransactionType": subsequentTransactionType,
+            "subsequentTransactionType": subsequentTransactionType.value,
         }        
 
         if cardVerificationData:
