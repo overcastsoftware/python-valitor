@@ -1,13 +1,15 @@
 Valitor python library
 ========================
 
-Python implementation of the Valitor payments solution.
+Python implementation of the Valitor payments solution. Currently supported are:
 
+    * Valitor Payments Gateway
+    * ValitorPay
 
 
 Test coverage
 =============
-<img width="628" alt="screenshot 2018-11-30 15 52 55" src="https://user-images.githubusercontent.com/143557/49299693-485cc800-f4b8-11e8-863d-48f79b89ed7f.png">
+<img width="628" alt="coverage" src="https://user-images.githubusercontent.com/143557/67790083-0a23ac00-fa6d-11e9-855e-1b646ec3c7a3.png">
 
 
 Testing
