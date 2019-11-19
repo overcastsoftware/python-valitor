@@ -12,3 +12,6 @@ test_currencies:
 
 test_valitorpay:
 	pytest -s -v -m valitorpay tests
+
+test_valitorpaymentpage:
+	pytest -s -v -m valitorpaymentpage tests
