@@ -27,9 +27,8 @@ class ValitorPaymentPageClient(object):
 
     def __init__(self, merchant_id, verification_code, testing=True):
         self.TESTING = testing
-
+        self.VERIFICATION_CODE = verification_code
         self.set_option('MerchantID', merchant_id)
-        self.set_option('VerificationCode', verification_code)
 
         self._products = []
 
@@ -67,7 +66,7 @@ class ValitorPaymentPageClient(object):
 
     def generate_signature(self):
         m = hashlib.sha256()
-        m.update(self.options['VerificationCode'].encode('utf-8'))
+        m.update(str(self.VERIFICATION_CODE).encode('utf-8'))
         m.update(self.options['AuthorizationOnly'].encode('utf-8'))
         for product in self._products:
             m.update(product['Quantity'].encode('utf-8'))
