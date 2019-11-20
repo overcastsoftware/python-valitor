@@ -129,3 +129,16 @@ def test_sha():
     m = hashlib.sha256()
     m.update("abc".encode('utf-8'))
     assert m.hexdigest() == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+
+
+@pytest.mark.valitorpaymentpage
+def test_signature_verification(valitor):
+        reference = "3081da14-4764-4d34-abd8-a314e24d422d"
+        import hashlib
+        m = hashlib.sha256()
+        m.update("1".encode('utf-8'))
+        m.update(reference.encode('utf-8'))
+        signature_response = m.hexdigest()
+
+        valid = valitor.verify_signature(reference, signature_response)
+        assert valid == True

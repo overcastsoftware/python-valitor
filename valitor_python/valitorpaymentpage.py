@@ -80,6 +80,14 @@ class ValitorPaymentPageClient(object):
         
         return m.hexdigest()
 
+    def verify_signature(self, reference_number, signature_response):
+        m = hashlib.sha256()
+        m.update(self.VERIFICATION_CODE.encode('utf-8'))
+        m.update(reference_number.encode('utf-8'))
+        signature = m.hexdigest()
+
+        return signature == signature_response
+
     def build_form_html(self, button_classes=""):
         options = ""
         for key, value in self.options.items():
