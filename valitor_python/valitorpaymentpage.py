@@ -88,7 +88,7 @@ class ValitorPaymentPageClient(object):
 
         return signature == signature_response
 
-    def build_form_html(self, button_classes=""):
+    def build_form_html(self, button_text="Pay", button_classes=""):
         options = ""
         for key, value in self.options.items():
             options += f"                <input type=\"hidden\" id=\"{key}\" name=\"{key}\" value=\"{value}\" />\n"
@@ -102,7 +102,7 @@ class ValitorPaymentPageClient(object):
             <form action="{self.ENDPOINT}" method="POST">
                 <input type="hidden" id="DigitalSignature" name="DigitalSignature" value="{self.generate_signature()}" />
 {options}
-                <button type="submit"{button_classes}>Greiða</button>
+                <button type="submit"{button_classes}>{button_text}</button>
             </form>
         """
 
