@@ -7,11 +7,12 @@ Python implementation of the Valitor payments solution. Currently supported are:
 
     * Valitor Payments Gateway
     * ValitorPay
+    * Valitor Hosted Payment Page
 
 
 Test coverage
 =============
-<img width="628" alt="coverage" src="https://user-images.githubusercontent.com/143557/67790083-0a23ac00-fa6d-11e9-855e-1b646ec3c7a3.png">
+<img width="694" alt="Screenshot 2020-05-12 at 14 47 53" src="https://user-images.githubusercontent.com/143557/81706627-a9cfe700-945f-11ea-8bb7-cfb0f15b4fbe.png">
 
 
 Testing
