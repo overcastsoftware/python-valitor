@@ -101,9 +101,9 @@ class ValitorPaymentPageClient(object):
         form = """
             <form action="{}" method="POST">
                 <input type="hidden" id="DigitalSignature" name="DigitalSignature" value="{}" />
-{options}
+{}
                 <button type="submit"{}>{}</button>
             </form>
-        """.format(self.ENDPOINT, self.generate_signature(), button_classes, button_text)
+        """.format(self.ENDPOINT, self.generate_signature(), options, button_classes, button_text)
 
         return form
