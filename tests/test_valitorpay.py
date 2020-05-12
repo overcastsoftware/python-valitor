@@ -42,7 +42,7 @@ def valitor(credentials):
 @pytest.fixture
 def wrong_credentials():
     return {
-        'apikey': "ApiKeyUAT.RxE3xfVnksfC/UnoDpu31UQ/gY"
+        'apikey': "DummyApiKey"
     }
 
 @pytest.fixture
