@@ -39,15 +39,15 @@ class ValitorPayClient(object):
 
 
     def format_url(self, path):
-        return f"{self.ENDPOINT}{path}"
+        return "{}{}".format(self.ENDPOINT, path)
 
     def check_error(self, response):
         if response.status_code == 400:
             errors = response.json()
             output = ""
             for k, v in errors.items():
-                vv = ", ".join(f"{x}" for x in v)
-                output += f"{k}: {vv}"
+                vv = ", ".join("{}".format(x) for x in v)
+                output += "{}: {}".format(k, vv)
             raise ValitorPayException(output)
         if response.status_code == 401:
             raise ValitorPayException("401 credentials error")
@@ -96,7 +96,7 @@ class ValitorPayClient(object):
 
     def make_request(self, action, method, **args):
         if method == 'POST':
-            response = requests.post(self.format_url(action), headers={'Authorization': f"APIKey {self.APIKEY}"}, **args)
+            response = requests.post(self.format_url(action), headers={'Authorization': "APIKey {}".format(self.APIKEY)}, **args)
 
         self.check_error(response)
         return response.json()
@@ -107,7 +107,7 @@ class ValitorPayClient(object):
         try:
             subsequentTransactionType = ValitorPayClient.SubsequentTransactionTypes(subsequentTransactionType)
         except ValueError:
-            raise ValitorPayException(message=f"Invalid subsequent transaction type '{subsequentTransactionType}'")
+            raise ValitorPayException(message="Invalid subsequent transaction type '{}'".format(subsequentTransactionType))
 
         payload = {
             "cardNumber": cardNumber,
@@ -130,17 +130,17 @@ class ValitorPayClient(object):
         try:
             currency = Currency(currency)
         except ValueError:
-            raise ValitorPayException(message=f"Invalid currency '{currency}'")
+            raise ValitorPayException(message="Invalid currency '{}'".format(currency))
 
         try:
             operation = ValitorPayClient.CardOperation(operation)
         except ValueError:
-            raise ValitorPayException(message=f"Invalid operation '{operation}'")
+            raise ValitorPayException(message="Invalid operation '{}'".format(operation))
 
         try:
             transactionType = ValitorPayClient.TransactionType(transactionType)
         except ValueError:
-            raise ValitorPayException(message=f"Invalid transaction type '{transactionType}'")
+            raise ValitorPayException(message="Invalid transaction type '{}'".format(transactionType))
 
         payload = {
             "cardNumber": cardNumber,
@@ -171,12 +171,12 @@ class ValitorPayClient(object):
         try:
             currency = Currency(currency)
         except ValueError:
-            raise ValitorPayException(message=f"Invalid currency '{currency}'")
+            raise ValitorPayException(message="Invalid currency '{}'".format(currency))
 
         try:
             operation = ValitorPayClient.VirtualCardOperation(operation)
         except ValueError:
-            raise ValitorPayException(message=f"Invalid operation '{operation}'")
+            raise ValitorPayException(message="Invalid operation '{}'".format(operation))
 
 
         payload = {

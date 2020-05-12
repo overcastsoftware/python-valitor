@@ -36,7 +36,7 @@ class ValitorPaymentPageClient(object):
             self.ENDPOINT = 'https://paymentweb.valitor.is'
 
     def format_url(self, path):
-        return f"{self.ENDPOINT}{path}"
+        return "{}{}".format(self.ENDPOINT, path)
     
     def set_option(self, key, value):
         self.options[key] = str(value)
@@ -57,10 +57,10 @@ class ValitorPaymentPageClient(object):
     def products_flat(self):
         result = {}
         for i, product in enumerate(self._products):
-            result[f"Product_{i+1}_Quantity"] = str(product['Quantity'])
-            result[f"Product_{i+1}_Price"] = str(product['Price'])
-            result[f"Product_{i+1}_Discount"] = str(product['Discount'])
-            result[f"Product_{i+1}_Description"] = str(product['Description'])
+            result["Product_{}_Quantity".format(i+1)] = str(product['Quantity'])
+            result["Product_{}_Price".format(i+1)] = str(product['Price'])
+            result["Product_{}_Discount".format(i+1)] = str(product['Discount'])
+            result["Product_{}_Description".format(i+1)] = str(product['Description'])
         return result
             
 
@@ -91,19 +91,19 @@ class ValitorPaymentPageClient(object):
     def build_form_html(self, button_text="Pay", button_classes=""):
         options = ""
         for key, value in self.options.items():
-            options += f"                <input type=\"hidden\" id=\"{key}\" name=\"{key}\" value=\"{value}\" />\n"
+            options += "                <input type=\"hidden\" id=\"{}\" name=\"{}\" value=\"{}\" />\n".format(key, key, value)
         for key, value in self.products_flat.items():
-            options += f"                <input type=\"hidden\" id=\"{key}\" name=\"{key}\" value=\"{value}\" />\n"
+            options += "                <input type=\"hidden\" id=\"{}\" name=\"{}\" value=\"{}\" />\n".format(key, key, value)
 
         if button_classes:
-            button_classes = f" class=\"{button_classes}\""
+            button_classes = " class=\"{}\"".format(button_classes)
         
-        form = f"""
-            <form action="{self.ENDPOINT}" method="POST">
-                <input type="hidden" id="DigitalSignature" name="DigitalSignature" value="{self.generate_signature()}" />
+        form = """
+            <form action="{}" method="POST">
+                <input type="hidden" id="DigitalSignature" name="DigitalSignature" value="{}" />
 {options}
-                <button type="submit"{button_classes}>{button_text}</button>
+                <button type="submit"{}>{}</button>
             </form>
-        """
+        """.format(self.ENDPOINT, self.generate_signature(), button_classes, button_text)
 
         return form
