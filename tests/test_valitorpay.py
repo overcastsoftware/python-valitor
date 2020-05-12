@@ -33,10 +33,21 @@ def credentials():
         'apikey': apikey,
     }
 
-
 @pytest.fixture
 def valitor(credentials):
     return valitor_python.ValitorPayClient(**credentials)
+
+
+
+@pytest.fixture
+def wrong_credentials():
+    return {
+        'apikey': "DummyApiKey"
+    }
+
+@pytest.fixture
+def wrong_valitor(wrong_credentials):
+    return valitor_python.ValitorPayClient(**wrong_credentials)
 
 @pytest.fixture
 def verification_data():
@@ -60,6 +71,12 @@ def test_create_virtual_card(valitor, creditcard, verification_data):
     assert response['isSuccess'] == True
     assert 'virtualCard' in response.keys()
 
+
+@pytest.mark.valitorpay
+def test_create_virtual_card_without_credentials_raises_exception(wrong_valitor, creditcard, verification_data):
+
+    with pytest.raises(valitor_python.ValitorPayException) as exc_info:
+        response = wrong_valitor.CreateVirtualCard(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], cardVerificationData=None)
 
 @pytest.mark.valitorpay
 def test_create_virtual_card_without_verification_data_raises_exception(valitor, creditcard, verification_data):
