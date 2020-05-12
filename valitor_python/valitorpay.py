@@ -49,6 +49,8 @@ class ValitorPayClient(object):
                 vv = ", ".join(f"{x}" for x in v)
                 output += f"{k}: {vv}"
             raise ValitorPayException(output)
+        if response.status_code == 401:
+            raise ValitorPayException("401 credentials error")
 
 
     class SubsequentTransactionTypes(Enum):
@@ -94,7 +96,8 @@ class ValitorPayClient(object):
 
     def make_request(self, action, method, **args):
         if method == 'POST':
-            response = requests.post(self.format_url(action), auth=(self.APIKEY, ''), **args)
+            response = requests.post(self.format_url(action), headers={'Authorization': f"APIKey {self.APIKEY}"}, **args)
+
         self.check_error(response)
         return response.json()
 
