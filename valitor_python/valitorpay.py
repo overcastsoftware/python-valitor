@@ -208,12 +208,12 @@ class ValitorPayClient(object):
         try:
             currency = Currency(currency)
         except ValueError:
-            raise ValitorPayException(message=f"Invalid currency '{currency}'")
+            raise ValitorPayException(message="Invalid currency '{}'".format(currency))
 
         try:
             operation = ValitorPayClient.VirtualCardOperation(operation)
         except ValueError:
-            raise ValitorPayException(message=f"Invalid operation '{operation}'")
+            raise ValitorPayException(message="Invalid operation '{}'".format(operation))
 
 
         payload = {
