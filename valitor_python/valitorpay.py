@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import date, datetime, timedelta
+import base64
 from .errors import ValitorPayException
 import uuid
 from enum import Enum
@@ -79,6 +80,13 @@ class ValitorPayClient(object):
         Advice = 'Advice'
 
 
+    class CardHolderDeviceType(Enum):
+        # Cardholder is connecting over the internet (web). This is the default, choose this option if you are unsure about what to choose.
+        WWW = 'WWW' 
+        MobileSdk = 'MobileSdk' # Mobile SDK (for ThreeDSecure 2.x only)
+        ThreeRIFlow = 'ThreeRIFlow' #Mobile SDK (for ThreeDSecure 2.x only)
+
+
     class TransactionType(Enum):
         ECommerce = 'ECommerce'
         SubsequentTransaction = 'SubsequentTransaction'
@@ -91,7 +99,7 @@ class ValitorPayClient(object):
         self.TESTING = testing
 
         if not testing:
-            self.ENDPOINT = 'https://api.processing.valitor.com/Fyrirtaekjagreidslur/Fyrirtaekjagreidslur.asmx'
+            self.ENDPOINT = 'https://valitorpay.com'
 
 
     def make_request(self, action, method, **args):
@@ -100,6 +108,35 @@ class ValitorPayClient(object):
 
         self.check_error(response)
         return response.json()
+
+
+    
+    def CardVerification(self, cardNumber, expirationYear, expirationMonth, cvc, amount, currency, authenticationSuccessUrl, authenticationFailedUrl, merchantData='', subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardHolderDeviceType=CardHolderDeviceType.WWW):
+
+        try:
+            currency = Currency(currency)
+        except ValueError:
+            raise ValitorPayException(message="Invalid currency '{}'".format(currency))
+
+        try:
+            cardHolderDeviceType = ValitorPayClient.CardHolderDeviceType(cardHolderDeviceType)
+        except ValueError:
+            raise ValitorPayException(message="Invalid cardholder device type '{}'".format(cardHolderDeviceType))
+
+        payload = {
+            "amount": amount,
+            "currency": currency.value,
+            "cardNumber": cardNumber,
+            "expirationMonth": expirationMonth,
+            "expirationYear": expirationYear,
+            "cvc": cvc,
+            "cardHolderDeviceType": cardHolderDeviceType.value,
+            "merchantData": base64.b64encode(merchantData.encode()).decode('utf-8'),
+            "authenticationSuccessUrl": authenticationSuccessUrl,
+            "authenticationFailedUrl": authenticationFailedUrl,
+        }
+
+        return self.make_request("/CardVerification", "POST", json=payload)
 
 
     def CreateVirtualCard(self, cardNumber, expirationYear, expirationMonth, cvc, subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardVerificationData=None):
@@ -125,7 +162,7 @@ class ValitorPayClient(object):
         return self.make_request("/VirtualCard/CreateVirtualCard", "POST", json=payload)
 
 
-    def CardPayment(self, cardNumber, expirationYear, expirationMonth, cvc, operation, transactionType, currency, amount, acquirerReferenceNumber=None, cardVerificationData=None):
+    def CardPayment(self, cardNumber, expirationYear, expirationMonth, cvc, amount, currency, operation, transactionType, acquirerReferenceNumber=None, cardVerificationData=None):
         
         try:
             currency = Currency(currency)
@@ -166,7 +203,7 @@ class ValitorPayClient(object):
 
 
 
-    def VirtualCardPayment(self, virtualCardNumber, currency, amount, operation):
+    def VirtualCardPayment(self, virtualCardNumber, amount, currency, operation):
 
         try:
             currency = Currency(currency)

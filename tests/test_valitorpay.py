@@ -49,6 +49,7 @@ def wrong_credentials():
 def wrong_valitor(wrong_credentials):
     return valitor_python.ValitorPayClient(**wrong_credentials)
 
+
 @pytest.fixture
 def verification_data():
     return {
@@ -61,6 +62,15 @@ def verification_data():
 @pytest.mark.valitorpay
 def test_can_init_client(credentials):
     valitor = valitor_python.ValitorPayClient(**credentials)
+
+
+@pytest.mark.valitorpay
+def test_card_verification(valitor, creditcard):
+
+    response = valitor.CardVerification(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 0, 'ISK', 'http://acme.com/success', 'http://acme.com/failed', merchantData='reference-1000')
+
+    assert response['isSuccess'] == True
+    assert 'cardVerificationRawResponse' in response.keys()
 
 
 @pytest.mark.valitorpay
@@ -88,13 +98,13 @@ def test_create_virtual_card_without_verification_data_raises_exception(valitor,
 @pytest.mark.valitorpay
 def test_card_payment(valitor, creditcard, verification_data):
 
-    response = valitor.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], valitor.CardOperation.Sale, valitor.TransactionType.ECommerce, "ISK", 100, cardVerificationData=verification_data)
+    response = valitor.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 100, "ISK", valitor.CardOperation.Sale, valitor.TransactionType.ECommerce, cardVerificationData=verification_data)
     print(response)
 
 
 @pytest.mark.valitorpay
 def test_virtual_card_payment(valitor, creditcard, verification_data):
 
-    response = valitor.VirtualCardPayment(creditcard['virtual'], "ISK", 100, valitor.VirtualCardOperation.Sale)
+    response = valitor.VirtualCardPayment(creditcard['virtual'], 100, "ISK", valitor.VirtualCardOperation.Sale)
     print(response)
 
