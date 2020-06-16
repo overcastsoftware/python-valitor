@@ -46,7 +46,7 @@ class ValitorPayClient(object):
         if response.status_code == 400:
             errors = response.json()
             output = ""
-            for k, v in errors.items():
+            for k, v in errors['errors'].items():
                 vv = ", ".join("{}".format(x) for x in v)
                 output += "{}: {}".format(k, vv)
             raise ValitorPayException(output)
