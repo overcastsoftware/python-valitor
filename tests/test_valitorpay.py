@@ -67,7 +67,7 @@ def test_can_init_client(credentials):
 @pytest.mark.valitorpay
 def test_card_verification(valitor, creditcard):
 
-    response = valitor.CardVerification(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 0, 'ISK', 'http://acme.com/success', 'http://acme.com/failed', merchantData='reference-1000')
+    response = valitor.CardVerification(creditcard['number'], creditcard['year'], creditcard['month'], 0, 'ISK', 'http://acme.com/success', 'http://acme.com/failed', merchantData='reference-1000')
 
     assert response['isSuccess'] == True
     assert 'cardVerificationRawResponse' in response.keys()

@@ -111,7 +111,7 @@ class ValitorPayClient(object):
 
 
     
-    def CardVerification(self, cardNumber, expirationYear, expirationMonth, cvc, amount, currency, authenticationSuccessUrl, authenticationFailedUrl, merchantData='', subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardHolderDeviceType=CardHolderDeviceType.WWW):
+    def CardVerification(self, cardNumber, expirationYear, expirationMonth, amount, currency, authenticationSuccessUrl, authenticationFailedUrl, merchantData='', subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardHolderDeviceType=CardHolderDeviceType.WWW):
 
         try:
             currency = Currency(currency)
@@ -129,7 +129,6 @@ class ValitorPayClient(object):
             "cardNumber": cardNumber,
             "expirationMonth": expirationMonth,
             "expirationYear": expirationYear,
-            "cvc": cvc,
             "cardHolderDeviceType": cardHolderDeviceType.value,
             "merchantData": base64.b64encode(merchantData.encode()).decode('utf-8'),
             "authenticationSuccessUrl": authenticationSuccessUrl,
