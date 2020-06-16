@@ -135,8 +135,13 @@ class ValitorPayClient(object):
             "authenticationFailedUrl": authenticationFailedUrl,
         }
 
-        return self.make_request("/CardVerification", "POST", json=payload)
+        response = self.make_request("/CardVerification", "POST", json=payload)
 
+        if response["isSuccess"] == True:
+            threedee_response = requests.post(response['postUrl'], data=dict(map(lambda x: (x['name'], x['value']), response['verificationFields'])))
+            return threedee_response.text
+        else:
+            raise ValitorPayException(message="Unsuccessful request")
 
     def CreateVirtualCard(self, cardNumber, expirationYear, expirationMonth, cvc, subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardVerificationData=None):
 
