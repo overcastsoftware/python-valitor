@@ -54,7 +54,6 @@ def wrong_valitor(wrong_credentials):
 def verification_data():
     return {
         "cardholderAuthenticationVerificationData": "hq6EHIP0PfZEYwAAnuCpB4MAAAA=",
-        "mdStatus": 4,
         "transactionXid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE="
     }
 

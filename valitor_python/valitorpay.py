@@ -9,26 +9,9 @@ import requests
 from .currencies import ISO4217 as Currency
 
 class CardVerificationData(object):
-
-    class MdStatusTypes(Enum):
-        MdFullyAuthenticated = 1
-        MdNotEnrolled = 2
-        MdAttempt = 3
-        MdUReceived = 4
-
-        @classmethod
-        def is_valid_status_type(self, status_type):
-            try:
-                CardVerificationData.MdStatusTypes(status_type)
-                return True
-            except ValueError:
-                return False
-
-    def __init__(self, cardholderAuthenticationVerificationData, mdStatus, transactionXid):
-        assert CardVerificationData.MdStatusTypes.is_valid_status_type(mdStatus)
+    def __init__(self, cardholderAuthenticationVerificationData, transactionXid):
         self.data = {
             'cardholderAuthenticationVerificationData': cardholderAuthenticationVerificationData,
-            'mdStatus': mdStatus,
             'transactionXid': transactionXid,
         }
 
