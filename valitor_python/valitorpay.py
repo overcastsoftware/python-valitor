@@ -126,12 +126,19 @@ class ValitorPayClient(object):
         else:
             raise ValitorPayException(message="Unsuccessful request")
 
-    def CreateVirtualCard(self, cardNumber, expirationYear, expirationMonth, cvc, subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardVerificationData=None):
+    def CreateVirtualCard(self, cardNumber, expirationYear, expirationMonth, cvc, subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardVerificationData=None, currency=None):
 
         try:
             subsequentTransactionType = ValitorPayClient.SubsequentTransactionTypes(subsequentTransactionType)
         except ValueError:
             raise ValitorPayException(message="Invalid subsequent transaction type '{}'".format(subsequentTransactionType))
+
+        if currency:
+            try:
+                currency = Currency(currency)
+            except ValueError:
+                raise ValitorPayException(message="Invalid currency '{}'".format(currency))
+
 
         payload = {
             "cardNumber": cardNumber,
@@ -140,6 +147,9 @@ class ValitorPayClient(object):
             "cvc": cvc,
             "subsequentTransactionType": subsequentTransactionType.value,
         }        
+
+        if currency:
+            payload["currency"] = currency.value
 
         if cardVerificationData:
             cv_data = CardVerificationData(**cardVerificationData)
