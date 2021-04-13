@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 
 from datetime import date, datetime, timedelta
 import base64
@@ -9,13 +9,28 @@ import requests
 from .currencies import ISO4217 as Currency
 
 class CardVerificationData(object):
-    def __init__(self, cardholderAuthenticationVerificationData, transactionXid, mdStatus=None):
+    def __init__(self, cavv, xid, mdStatus=None, dsTransId=None):
         data = {
-            'cardholderAuthenticationVerificationData': cardholderAuthenticationVerificationData,
-            'transactionXid': transactionXid,
+            'cardholderAuthenticationVerificationData': cavv,
+            'transactionXid': xid,
         }
         if mdStatus:
             data['mdStatus'] = mdStatus
+        if dsTransId:
+            data['dsTransId'] = dsTransId
+        self.data = data
+
+
+class CardVerificationDataV2(object):
+    def __init__(self, cavv, xid, mdStatus=None, dsTransId=None):
+        data = {
+            'cavv': cavv,
+            'xid': xid,
+        }
+        if mdStatus:
+            data['mdStatus'] = mdStatus
+        if dsTransId:
+            data['dsTransId'] = dsTransId
         self.data = data
 
 
@@ -177,10 +192,13 @@ class ValitorPayClient(object):
             payload["currency"] = currency.value
 
         if cardVerificationData:
-            cv_data = CardVerificationData(**cardVerificationData)
-            assert "cardholderAuthenticationVerificationData" in cardVerificationData
-            payload["cardVerificationData"] = cardVerificationData
-
+            assert "cavv" in cardVerificationData
+            if self.APIVERSION == '1.0':
+                cv_data = CardVerificationData(**cardVerificationData)
+            if self.APIVERSION == '2.0':
+                cv_data = CardVerificationDataV2(**cardVerificationData)
+            payload["cardVerificationData"] = cv_data.data
+        
         return self.make_request("/VirtualCard/CreateVirtualCard", "POST", json=payload)
 
 
@@ -217,15 +235,18 @@ class ValitorPayClient(object):
             payload['acquirerReferenceNumber'] = acquirerReferenceNumber
     
         if cardVerificationData:
-            cv_data = CardVerificationData(**cardVerificationData)
-            assert "cardholderAuthenticationVerificationData" in cardVerificationData
-            payload["cardVerificationData"] = cardVerificationData
+            assert "cavv" in cardVerificationData
+            if self.APIVERSION == '1.0':
+                cv_data = CardVerificationData(**cardVerificationData)
+            if self.APIVERSION == '2.0':
+                cv_data = CardVerificationDataV2(**cardVerificationData)
+            payload["cardVerificationData"] = cv_data.data
 
         return self.make_request("/Payment/CardPayment", "POST", json=payload)
 
 
 
-    def VirtualCardPayment(self, virtualCardNumber, amount, currency, operation):
+    def VirtualCardPayment(self, virtualCardNumber, amount, currency, operation, cardVerificationData=None):
 
         try:
             currency = Currency(currency)
@@ -244,6 +265,14 @@ class ValitorPayClient(object):
             'amount': amount,
             'virtualCardNumber': virtualCardNumber,
         } 
+
+        if cardVerificationData:
+            assert "cavv" in cardVerificationData
+            if self.APIVERSION == '1.0':
+                cv_data = CardVerificationData(**cardVerificationData)
+            if self.APIVERSION == '2.0':
+                cv_data = CardVerificationDataV2(**cardVerificationData)
+            payload["cardVerificationData"] = cv_data.data
 
         return self.make_request("/Payment/VirtualCardPayment", "POST", json=payload)
 

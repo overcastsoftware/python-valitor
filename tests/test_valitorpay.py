@@ -37,7 +37,11 @@ def credentials():
 def valitor(credentials):
     return valitor_python.ValitorPayClient(**credentials)
 
-
+@pytest.fixture
+def valitor_v2(credentials):
+    options = {'apiversion': '2.0'}
+    options.update(**credentials)
+    return valitor_python.ValitorPayClient(**options)
 
 @pytest.fixture
 def wrong_credentials():
@@ -53,15 +57,15 @@ def wrong_valitor(wrong_credentials):
 @pytest.fixture
 def verification_data():
     return {
-        "cardholderAuthenticationVerificationData": "jq6EHIP0PfZEYwAAnuCpB4MAAAA=",
-        "transactionXid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE=",
+        "cavv": "jq6EHIP0PfZEYwAAnuCpB4MAAAA=",
+        "xid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE=",
     }
 
 @pytest.fixture
 def verification_data_payment():
     return {
-        "cardholderAuthenticationVerificationData": "jq6EHIP0PfZEYwAAnuCpB4MAAAA=",
-        "transactionXid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE=",
+        "cavv": "jq6EHIP0PfZEYwAAnuCpB4MAAAA=",
+        "xid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE=",
         "mdStatus": "1",
     }
 
@@ -119,5 +123,23 @@ def test_card_payment(valitor, creditcard, verification_data_payment):
 @pytest.mark.valitorpay
 def test_virtual_card_payment(valitor, creditcard, verification_data):
     response = valitor.VirtualCardPayment(creditcard['virtual'], 100, "ISK", valitor.VirtualCardOperation.Sale)
+    assert response["isSuccess"] == True
+
+@pytest.mark.valitorpay
+def test_create_virtual_card_v2(valitor_v2, creditcard, verification_data):
+
+    response = valitor_v2.CreateVirtualCard(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], cardVerificationData=verification_data)
+
+    assert response['isSuccess'] == True
+    assert 'virtualCard' in response.keys()
+
+@pytest.mark.valitorpay
+def test_card_payment_v2(valitor_v2, creditcard, verification_data_payment):
+    response = valitor_v2.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 100, "ISK", valitor_v2.CardOperation.Sale, valitor_v2.TransactionType.ECommerce, cardVerificationData=verification_data_payment)
+    assert response["isSuccess"] == True
+
+@pytest.mark.valitorpay
+def test_virtual_card_payment_v2(valitor_v2, creditcard, verification_data):
+    response = valitor_v2.VirtualCardPayment(creditcard['virtual'], 100, "ISK", valitor_v2.VirtualCardOperation.Sale)
     assert response["isSuccess"] == True
 
