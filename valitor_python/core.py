@@ -109,6 +109,24 @@ class ValitorClient(object):
         return serialize_object(response['Kvittun'])
 
 
+    def FaOgildingu(self, card_number_virtual, transaction_id, currency='ISK'):
+        response = self.client.service.FaOgildingu  (
+            Notandanafn=self.USERNAME,
+            Lykilord=self.PASSWORD,
+            Samningsnumer=self.CONTRACT_NUMBER,
+            SamningsKennitala=self.CONTRACT_ID,
+            PosiID=self.POSI_ID,
+            Syndarkortnumer=card_number_virtual,
+            Faerslunumer=transaction_id,
+            Gjaldmidill=currency,
+            Stillingar=''
+        )
+            
+        self.check_error(response)
+
+        return serialize_object(response['Kvittun'])
+
+
     def UppfaeraGildistima(self, card_number_virtual, valid_until_year, valid_until_month):
         response = self.client.service.UppfaeraGildistima(
             Notandanafn=self.USERNAME,

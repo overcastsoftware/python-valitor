@@ -9,11 +9,14 @@ import requests
 from .currencies import ISO4217 as Currency
 
 class CardVerificationData(object):
-    def __init__(self, cardholderAuthenticationVerificationData, transactionXid):
-        self.data = {
+    def __init__(self, cardholderAuthenticationVerificationData, transactionXid, mdStatus=None):
+        data = {
             'cardholderAuthenticationVerificationData': cardholderAuthenticationVerificationData,
             'transactionXid': transactionXid,
         }
+        if mdStatus:
+            data['mdStatus'] = mdStatus
+        self.data = data
 
 
 class ValitorPayClient(object):
@@ -77,9 +80,15 @@ class ValitorPayClient(object):
         TelephoneOrder = 'TelephoneOrder'
 
 
-    def __init__(self, apikey, testing=True):
+    class ThreeDeeSecureResponseType(Enum):
+        HTML = 'HTML' 
+        JSON = 'JSON'
+
+
+    def __init__(self, apikey, testing=True, apiversion='1.0'):
         self.APIKEY = apikey
         self.TESTING = testing
+        self.APIVERSION = apiversion
 
         if not testing:
             self.ENDPOINT = 'https://valitorpay.com'
@@ -87,14 +96,18 @@ class ValitorPayClient(object):
 
     def make_request(self, action, method, **args):
         if method == 'POST':
-            response = requests.post(self.format_url(action), headers={'Authorization': "APIKey {}".format(self.APIKEY)}, **args)
+            headers = {
+                'Authorization': "APIKey {}".format(self.APIKEY),
+                'valitorpay-api-version': self.APIVERSION,
+            }
+            response = requests.post(self.format_url(action), headers=headers, **args)
 
         self.check_error(response)
         return response.json()
 
 
     
-    def CardVerification(self, cardNumber, expirationYear, expirationMonth, amount, currency, authenticationSuccessUrl, authenticationFailedUrl, merchantData='', subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardHolderDeviceType=CardHolderDeviceType.WWW):
+    def CardVerification(self, cardNumber, expirationYear, expirationMonth, amount, currency, authenticationSuccessUrl, authenticationFailedUrl, merchantData='', subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardHolderDeviceType=CardHolderDeviceType.WWW, threeDeeSecureResponseType=ThreeDeeSecureResponseType.HTML):
 
         try:
             currency = Currency(currency)
@@ -105,6 +118,11 @@ class ValitorPayClient(object):
             cardHolderDeviceType = ValitorPayClient.CardHolderDeviceType(cardHolderDeviceType)
         except ValueError:
             raise ValitorPayException(message="Invalid cardholder device type '{}'".format(cardHolderDeviceType))
+
+        try:
+            threeDeeSecureResponseType = ValitorPayClient.ThreeDeeSecureResponseType(threeDeeSecureResponseType)
+        except ValueError:
+            raise ValitorPayException(message="Invalid 3DS response type '{}'".format(threeDeeSecureResponseType))
 
         payload = {
             "amount": amount,
@@ -121,10 +139,17 @@ class ValitorPayClient(object):
         response = self.make_request("/CardVerification", "POST", json=payload)
 
         if response["isSuccess"] == True:
-            threedee_response = requests.post(response['postUrl'], data=dict(map(lambda x: (x['name'], x['value']), response['verificationFields'])))
-            return threedee_response.text
+            if threeDeeSecureResponseType == ValitorPayClient.ThreeDeeSecureResponseType.HTML:
+                threedee_response = requests.post(response['postUrl'], data=dict(map(lambda x: (x['name'], x['value']), response['verificationFields'])))
+                return threedee_response.text
+            else:
+                return {
+                    'postUrl': response['postUrl'],
+                    'verificationFields': dict(map(lambda x: (x['name'], x['value']), response['verificationFields'])),
+                }
         else:
             raise ValitorPayException(message="Unsuccessful request")
+
 
     def CreateVirtualCard(self, cardNumber, expirationYear, expirationMonth, cvc, subsequentTransactionType=SubsequentTransactionTypes.CardholderInitiatedCredentialOnFile, cardVerificationData=None, currency=None):
 

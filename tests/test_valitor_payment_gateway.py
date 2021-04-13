@@ -101,6 +101,14 @@ def test_fa_heimild_with_invalid_card_raises_exception(valitor, creditcard):
     
     assert exc_info.value.number == 220
 
+@pytest.mark.valitor
+def test_fa_heimild_with_invalid_currency_raises_exception(valitor, creditcard):
+    amount = '2990'
+
+    with pytest.raises(valitor_python.ValitorException) as exc_info:
+        response = valitor.FaHeimild(creditcard['virtual'], amount, 'USD')
+    
+    assert exc_info.value.number == 999
 
 @pytest.mark.valitor
 def test_fa_endurgreitt(valitor, creditcard):

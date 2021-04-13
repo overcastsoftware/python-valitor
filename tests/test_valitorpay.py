@@ -53,8 +53,16 @@ def wrong_valitor(wrong_credentials):
 @pytest.fixture
 def verification_data():
     return {
-        "cardholderAuthenticationVerificationData": "hq6EHIP0PfZEYwAAnuCpB4MAAAA=",
-        "transactionXid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE="
+        "cardholderAuthenticationVerificationData": "jq6EHIP0PfZEYwAAnuCpB4MAAAA=",
+        "transactionXid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE=",
+    }
+
+@pytest.fixture
+def verification_data_payment():
+    return {
+        "cardholderAuthenticationVerificationData": "jq6EHIP0PfZEYwAAnuCpB4MAAAA=",
+        "transactionXid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE=",
+        "mdStatus": "1",
     }
 
 
@@ -68,8 +76,16 @@ def test_card_verification(valitor, creditcard):
 
     response = valitor.CardVerification(creditcard['number'], creditcard['year'], creditcard['month'], 0, 'ISK', 'http://acme.com/success', 'http://acme.com/failed', merchantData='reference-1000')
 
-    assert response['isSuccess'] == True
-    assert 'cardVerificationRawResponse' in response.keys()
+    assert 'cavv' in response
+    assert 'xid' in response
+
+@pytest.mark.valitorpay
+def test_card_verification_json(valitor, creditcard):
+
+    response = valitor.CardVerification(creditcard['number'], creditcard['year'], creditcard['month'], 0, 'ISK', 'http://acme.com/success', 'http://acme.com/failed', merchantData='reference-1000', threeDeeSecureResponseType=valitor.ThreeDeeSecureResponseType.JSON)
+
+    assert 'postUrl' in response.keys()
+    assert 'verificationFields' in response.keys()
 
 
 @pytest.mark.valitorpay
@@ -95,15 +111,13 @@ def test_create_virtual_card_without_verification_data_raises_exception(valitor,
 
 
 @pytest.mark.valitorpay
-def test_card_payment(valitor, creditcard, verification_data):
-
-    response = valitor.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 100, "ISK", valitor.CardOperation.Sale, valitor.TransactionType.ECommerce, cardVerificationData=verification_data)
-    print(response)
+def test_card_payment(valitor, creditcard, verification_data_payment):
+    response = valitor.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 100, "ISK", valitor.CardOperation.Sale, valitor.TransactionType.ECommerce, cardVerificationData=verification_data_payment)
+    assert response["isSuccess"] == True
 
 
 @pytest.mark.valitorpay
 def test_virtual_card_payment(valitor, creditcard, verification_data):
-
     response = valitor.VirtualCardPayment(creditcard['virtual'], 100, "ISK", valitor.VirtualCardOperation.Sale)
-    print(response)
+    assert response["isSuccess"] == True
 
