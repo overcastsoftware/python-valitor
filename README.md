@@ -5,9 +5,9 @@ Valitor python library
 
 Python implementation of the Valitor payments solution. Currently supported are:
 
-    * Valitor Payments Gateway
-    * ValitorPay
-    * Valitor Hosted Payment Page
+ * Valitor Payments Gateway
+ * ValitorPay
+ * Valitor Hosted Payment Page
 
 
 Test coverage
