@@ -11,29 +11,25 @@ import hashlib
 
 class ValitorPaymentPageClient(object):
 
-    MERCHANT_ID = ''
-    VERIFICATION_CODE = ''
-    ENDPOINT = 'https://paymentweb.uat.valitor.is'
-
-
-    options = {
-        'AuthorizationOnly': '0',
-        'ReferenceNumber': '',
-        'PaymentSuccessfulURL': '',
-        'PaymentSuccessfulServerSideURL': '',
-        'Currency': 'ISK',
-    }
-
-
     def __init__(self, merchant_id, verification_code, testing=True):
+        self.MERCHANT_ID = merchant_id
         self.TESTING = testing
         self.VERIFICATION_CODE = verification_code
-        self.set_option('MerchantID', merchant_id)
 
         self._products = []
+        self.options =  {
+            'AuthorizationOnly': '0',
+            'ReferenceNumber': '',
+            'PaymentSuccessfulURL': '',
+            'PaymentSuccessfulServerSideURL': '',
+            'Currency': 'ISK',
+        }
+        self.set_option('MerchantID', merchant_id)
 
         if not testing:
             self.ENDPOINT = 'https://paymentweb.valitor.is'
+        else:
+            self.ENDPOINT = 'https://paymentweb.uat.valitor.is'
 
     def format_url(self, path):
         return "{}{}".format(self.ENDPOINT, path)
