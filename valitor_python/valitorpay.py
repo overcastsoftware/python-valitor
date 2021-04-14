@@ -9,10 +9,10 @@ import requests
 from .currencies import ISO4217 as Currency
 
 class CardVerificationData(object):
-    def __init__(self, cavv, xid, mdStatus=None, dsTransId=None):
+    def __init__(self, cardholderAuthenticationVerificationData, transactionXid, mdStatus=None, dsTransId=None):
         data = {
-            'cardholderAuthenticationVerificationData': cavv,
-            'transactionXid': xid,
+            'cardholderAuthenticationVerificationData': cardholderAuthenticationVerificationData,
+            'transactionXid': transactionXid,
         }
         if mdStatus:
             data['mdStatus'] = mdStatus
@@ -192,7 +192,6 @@ class ValitorPayClient(object):
             payload["currency"] = currency.value
 
         if cardVerificationData:
-            assert "cavv" in cardVerificationData
             if self.APIVERSION == '1.0':
                 cv_data = CardVerificationData(**cardVerificationData)
             if self.APIVERSION == '2.0':
@@ -235,7 +234,6 @@ class ValitorPayClient(object):
             payload['acquirerReferenceNumber'] = acquirerReferenceNumber
     
         if cardVerificationData:
-            assert "cavv" in cardVerificationData
             if self.APIVERSION == '1.0':
                 cv_data = CardVerificationData(**cardVerificationData)
             if self.APIVERSION == '2.0':
@@ -267,7 +265,6 @@ class ValitorPayClient(object):
         } 
 
         if cardVerificationData:
-            assert "cavv" in cardVerificationData
             if self.APIVERSION == '1.0':
                 cv_data = CardVerificationData(**cardVerificationData)
             if self.APIVERSION == '2.0':
