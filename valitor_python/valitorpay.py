@@ -35,10 +35,6 @@ class CardVerificationDataV2(object):
 
 
 class ValitorPayClient(object):
-    
-    APIKEY = ''
-    ENDPOINT = 'https://uat.valitorpay.com'
-
 
     def format_url(self, path):
         return "{}{}".format(self.ENDPOINT, path)
@@ -105,6 +101,7 @@ class ValitorPayClient(object):
         self.TESTING = testing
         self.APIVERSION = apiversion
 
+        self.ENDPOINT = 'https://uat.valitorpay.com'
         if not testing:
             self.ENDPOINT = 'https://valitorpay.com'
 
