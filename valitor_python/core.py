@@ -92,7 +92,7 @@ class ValitorClient(object):
 
 
     def FaEndurgreitt(self, card_number_virtual, amount, currency='ISK'):
-        response = self.client.service.FaHeimild(
+        response = self.client.service.FaEndurgreitt(
             Notandanafn=self.USERNAME,
             Lykilord=self.PASSWORD,
             Samningsnumer=self.CONTRACT_NUMBER,
