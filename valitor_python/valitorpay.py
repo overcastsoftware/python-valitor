@@ -271,3 +271,13 @@ class ValitorPayClient(object):
         return self.make_request("/Payment/VirtualCardPayment", "POST", json=payload)
 
 
+    def UpdateExpirationDate(self, virtualCardNumber, expirationMonth, expirationYear):
+
+        payload = {
+            'expirationMonth': expirationMonth,
+            'expirationYear': expirationYear,
+            'virtualCardNumber': virtualCardNumber,
+        } 
+
+        return self.make_request("/VirtualCard/UpdateExpirationDate", "POST", json=payload)
+

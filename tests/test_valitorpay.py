@@ -161,6 +161,7 @@ def test_create_virtual_card_v2(valitor_v2, creditcard, verification_data_v2):
     assert response['isSuccess'] == True
     assert 'virtualCard' in response.keys()
 
+
 @pytest.mark.valitorpay
 def test_card_payment_v2(valitor_v2, creditcard, verification_data_payment_v2):
     response = valitor_v2.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 100, "ISK", valitor_v2.CardOperation.Sale, valitor_v2.TransactionType.ECommerce, cardVerificationData=verification_data_payment_v2)
@@ -169,6 +170,11 @@ def test_card_payment_v2(valitor_v2, creditcard, verification_data_payment_v2):
 @pytest.mark.valitorpay
 def test_virtual_card_payment_v2(valitor_v2, creditcard, verification_data_v2):
     response = valitor_v2.VirtualCardPayment(creditcard['virtual'], 100, "ISK", valitor_v2.VirtualCardOperation.Sale)
+    assert response["isSuccess"] == True
+
+@pytest.mark.valitorpay
+def test_change_expiration_date(valitor_v2, creditcard):
+    response = valitor_v2.UpdateExpirationDate(creditcard['virtual'], '12', '2034')
     assert response["isSuccess"] == True
 
 @pytest.mark.valitorpay
