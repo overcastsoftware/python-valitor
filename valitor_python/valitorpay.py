@@ -285,7 +285,7 @@ class ValitorPayClient(object):
     def GetVirtualCardData(self, virtualCardNumber):
 
         payload = {
-            'virtualCardNumber': virtualCardNumber,
+            'virtualCard': virtualCardNumber,
         } 
 
         return self.make_request("/VirtualCard/GetVirtualCardData", "POST", json=payload)
