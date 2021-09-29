@@ -281,3 +281,12 @@ class ValitorPayClient(object):
 
         return self.make_request("/VirtualCard/UpdateExpirationDate", "POST", json=payload)
 
+
+    def GetVirtualCardData(self, virtualCardNumber):
+
+        payload = {
+            'virtualCardNumber': virtualCardNumber,
+        } 
+
+        return self.make_request("/VirtualCard/GetVirtualCardData", "POST", json=payload)
+
