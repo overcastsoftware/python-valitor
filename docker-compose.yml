@@ -1,0 +1,10 @@
+version: '3'
+
+volumes:
+  node_modules:
+services:
+  web:
+    build: .
+    command: tail -F anything
+    volumes:
+      - .:/code

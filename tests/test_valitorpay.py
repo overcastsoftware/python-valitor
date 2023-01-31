@@ -17,7 +17,7 @@ def creditcard():
     test card  should be in ENV variable VALITOR_TEST_CARD and contain information about the 
     card formatted as such:
 
-        VALITORPAY_TEST_CARD=number:<card number>,month:<month>,year:<year>,cvv:<CVV code>
+        VALITORPAY_TEST_CARD=number:<card number>,month:<month>,year:<year>,cvc:<CVV code>
 
     """
     testcard = os.getenv('VALITORPAY_TEST_CARD', None)

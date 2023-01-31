@@ -66,15 +66,21 @@ class ValitorPayClient(object):
 
     class VirtualCardOperation(Enum):
         Sale = 'Sale'
-        Reversal = 'Reversal'
+        Auth = 'Auth'
+        Refund = 'Refund'
+        Capture = 'Capture'
+        CaptureRefund = 'CaptureRefund'
+        RefundCancellation = 'RefundCancellation'
 
 
     class CardOperation(Enum):
         Sale = 'Sale'
-        Reversal = 'Reversal'
-        PreAuth = 'PreAuth'
+        Refund = 'Refund'
+        Auth = 'Auth'
         CardCheck = 'CardCheck'
-        Advice = 'Advice'
+        Capture = 'Capture'
+        CaptureRefund = 'CaptureRefund'
+        RefundCancellation = 'RefundCancellation'
 
 
     class CardHolderDeviceType(Enum):
@@ -227,7 +233,7 @@ class ValitorPayClient(object):
         }  
 
         if acquirerReferenceNumber:
-            assert operation == ValitorPayClient.CardOperation.Reversal
+            assert operation == ValitorPayClient.CardOperation.Refund
             payload['acquirerReferenceNumber'] = acquirerReferenceNumber
     
         if cardVerificationData:
@@ -241,7 +247,7 @@ class ValitorPayClient(object):
 
 
 
-    def VirtualCardPayment(self, virtualCardNumber, amount, currency, operation, cardVerificationData=None):
+    def VirtualCardPayment(self, virtualCardNumber, amount, currency, operation, cardVerificationData=None, acquirerReferenceNumber=None):
 
         try:
             currency = Currency(currency)
@@ -252,6 +258,15 @@ class ValitorPayClient(object):
             operation = ValitorPayClient.VirtualCardOperation(operation)
         except ValueError:
             raise ValitorPayException(message="Invalid operation '{}'".format(operation))
+
+        
+        if operation in [
+            ValitorPayClient.VirtualCardOperation.Refund,
+            ValitorPayClient.VirtualCardOperation.CaptureRefund,
+            ValitorPayClient.VirtualCardOperation.Capture,
+            ValitorPayClient.VirtualCardOperation.RefundCancellation
+        ] and acquirerReferenceNumber == None:
+            raise ValitorPayException(message="Acquirer reference number is required for this operation")
 
 
         payload = {
@@ -267,6 +282,26 @@ class ValitorPayClient(object):
             if self.APIVERSION == '2.0':
                 cv_data = CardVerificationDataV2(**cardVerificationData)
             payload["cardVerificationData"] = cv_data.data
+
+        return self.make_request("/Payment/VirtualCardPayment", "POST", json=payload)
+
+
+    def VirtualCardRefund(self, virtualCardNumber, amount, currency, acquirerReferenceNumber):
+
+        try:
+            currency = Currency(currency)
+        except ValueError:
+            raise ValitorPayException(message="Invalid currency '{}'".format(currency))
+
+        operation = ValitorPayClient.VirtualCardOperation.Refund
+
+        payload = {
+            'operation': operation.value,
+            'currency': currency.value,
+            'amount': amount,
+            'virtualCardNumber': virtualCardNumber,
+            'acquirerReferenceNumber': acquirerReferenceNumber,
+        } 
 
         return self.make_request("/Payment/VirtualCardPayment", "POST", json=payload)
 
