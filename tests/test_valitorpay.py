@@ -38,12 +38,6 @@ def valitor(credentials):
     return valitor_python.ValitorPayClient(**credentials)
 
 @pytest.fixture
-def valitor_v2(credentials):
-    options = {'apiversion': '2.0'}
-    options.update(**credentials)
-    return valitor_python.ValitorPayClient(**options)
-
-@pytest.fixture
 def wrong_credentials():
     return {
         'apikey': "DummyApiKey"
@@ -57,17 +51,11 @@ def wrong_valitor(wrong_credentials):
 @pytest.fixture
 def verification_data():
     return {
-        "cardholderAuthenticationVerificationData": "jq6EHIP0PfZEYwAAnuCpB4MAAAA=",
-        "transactionXid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE=",
-    }
-
-
-@pytest.fixture
-def verification_data_v2():
-    return {
         "cavv": "jq6EHIP0PfZEYwAAnuCpB4MAAAA=",
-        "xid": "nrQGVcVW0CIzw6wsqwIlxLAUTCE=",
+        "mdStatus": "MdAttempt",
+        "dsTransId": "f4bd9217-f3dd-4895-a207-bdf489aa5f7a"
     }
+
 
 
 @pytest.fixture
@@ -108,8 +96,8 @@ def test_card_verification(valitor, creditcard):
 
     response = valitor.CardVerification(creditcard['number'], creditcard['year'], creditcard['month'], 0, 'ISK', 'http://acme.com/success', 'http://acme.com/failed', merchantData='reference-1000')
 
-    assert 'cavv' in response
-    assert 'xid' in response
+    assert 'challengeForm' in response
+    assert 'creq' in response
 
 @pytest.mark.valitorpay
 def test_card_verification_json(valitor, creditcard):
@@ -123,7 +111,7 @@ def test_card_verification_json(valitor, creditcard):
 @pytest.mark.valitorpay
 def test_create_virtual_card(valitor, creditcard, verification_data):
 
-    response = valitor.CreateVirtualCard(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], cardVerificationData=verification_data)
+    response = valitor.CreateVirtualCard(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'])
 
     assert response['isSuccess'] == True
     assert 'virtualCard' in response.keys()
@@ -154,31 +142,30 @@ def test_virtual_card_payment(valitor, creditcard, verification_data):
     assert response["isSuccess"] == True
 
 @pytest.mark.valitorpay
-def test_create_virtual_card_v2(valitor_v2, creditcard, verification_data_v2):
+def test_create_virtual_card_v2(valitor, creditcard, verification_data):
 
-    response = valitor_v2.CreateVirtualCard(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], cardVerificationData=verification_data_v2)
+    response = valitor.CreateVirtualCard(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], cardVerificationData=verification_data)
 
     assert response['isSuccess'] == True
     assert 'virtualCard' in response.keys()
 
 
 @pytest.mark.valitorpay
-def test_card_payment_v2(valitor_v2, creditcard, verification_data_payment_v2):
-    response = valitor_v2.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 100, "ISK", valitor_v2.CardOperation.Sale, valitor_v2.TransactionType.ECommerce, cardVerificationData=verification_data_payment_v2)
+def test_card_payment_v2(valitor, creditcard, verification_data_payment_v2):
+    response = valitor.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 100, "ISK", valitor.CardOperation.Sale, valitor.TransactionType.ECommerce, cardVerificationData=verification_data_payment_v2)
     assert response["isSuccess"] == True
 
 @pytest.mark.valitorpay
-def test_virtual_card_payment_v2(valitor_v2, creditcard, verification_data_v2):
-    response = valitor_v2.VirtualCardPayment(creditcard['virtual'], 100, "ISK", valitor_v2.VirtualCardOperation.Sale)
+def test_virtual_card_payment_v2(valitor, creditcard, verification_data):
+    response = valitor.VirtualCardPayment(creditcard['virtual'], 100, "ISK", valitor.VirtualCardOperation.Sale)
     assert response["isSuccess"] == True
 
 @pytest.mark.valitorpay
-def test_change_expiration_date(valitor_v2, creditcard):
-    response = valitor_v2.UpdateExpirationDate(creditcard['virtual'], '12', '2034')
+def test_change_expiration_date(valitor, creditcard):
+    response = valitor.UpdateExpirationDate(creditcard['virtual'], '12', '2034')
     assert response["isSuccess"] == True
 
 @pytest.mark.valitorpay
-def test_card_payment_transid_v2(valitor_v2, creditcard, verification_data_payment_transid_v2):
-    response = valitor_v2.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 100, "ISK", valitor_v2.CardOperation.Sale, valitor_v2.TransactionType.ECommerce, cardVerificationData=verification_data_payment_transid_v2)
-    print(response)
+def test_card_payment_transid_v2(valitor, creditcard, verification_data_payment_transid_v2):
+    response = valitor.CardPayment(creditcard['number'], creditcard['year'], creditcard['month'], creditcard['cvc'], 100, "ISK", valitor.CardOperation.Sale, valitor.TransactionType.ECommerce, cardVerificationData=verification_data_payment_transid_v2)
     assert response["isSuccess"] == True

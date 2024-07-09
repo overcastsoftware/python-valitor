@@ -8,24 +8,12 @@ from enum import Enum
 import requests
 from .currencies import ISO4217 as Currency
 
-class CardVerificationData(object):
-    def __init__(self, cardholderAuthenticationVerificationData, transactionXid, mdStatus=None, dsTransId=None):
-        data = {
-            'cardholderAuthenticationVerificationData': cardholderAuthenticationVerificationData,
-            'transactionXid': transactionXid,
-        }
-        if mdStatus:
-            data['mdStatus'] = mdStatus
-        if dsTransId:
-            data['dsTransId'] = dsTransId
-        self.data = data
 
 
 class CardVerificationDataV2(object):
-    def __init__(self, cavv, xid, mdStatus=None, dsTransId=None):
+    def __init__(self, cavv, mdStatus=None, dsTransId=None):
         data = {
             'cavv': cavv,
-            'xid': xid,
         }
         if mdStatus:
             data['mdStatus'] = mdStatus
@@ -102,7 +90,7 @@ class ValitorPayClient(object):
         JSON = 'JSON'
 
 
-    def __init__(self, apikey, testing=True, apiversion='1.0'):
+    def __init__(self, apikey, testing=True, apiversion='2.0'):
         self.APIKEY = apikey
         self.TESTING = testing
         self.APIVERSION = apiversion
@@ -155,7 +143,6 @@ class ValitorPayClient(object):
         }
 
         response = self.make_request("/CardVerification", "POST", json=payload)
-
         if response["isSuccess"] == True:
             if threeDeeSecureResponseType == ValitorPayClient.ThreeDeeSecureResponseType.HTML:
                 threedee_response = requests.post(response['postUrl'], data=dict(map(lambda x: (x['name'], x['value']), response['verificationFields'])))
@@ -195,10 +182,7 @@ class ValitorPayClient(object):
             payload["currency"] = currency.value
 
         if cardVerificationData:
-            if self.APIVERSION == '1.0':
-                cv_data = CardVerificationData(**cardVerificationData)
-            if self.APIVERSION == '2.0':
-                cv_data = CardVerificationDataV2(**cardVerificationData)
+            cv_data = CardVerificationDataV2(**cardVerificationData)
             payload["cardVerificationData"] = cv_data.data
         
         return self.make_request("/VirtualCard/CreateVirtualCard", "POST", json=payload)
@@ -236,11 +220,7 @@ class ValitorPayClient(object):
             assert operation == ValitorPayClient.CardOperation.Refund
             payload['acquirerReferenceNumber'] = acquirerReferenceNumber
     
-        if cardVerificationData:
-            if self.APIVERSION == '1.0':
-                cv_data = CardVerificationData(**cardVerificationData)
-            if self.APIVERSION == '2.0':
-                cv_data = CardVerificationDataV2(**cardVerificationData)
+            cv_data = CardVerificationDataV2(**cardVerificationData)
             payload["cardVerificationData"] = cv_data.data
 
         return self.make_request("/Payment/CardPayment", "POST", json=payload)
@@ -277,10 +257,7 @@ class ValitorPayClient(object):
         } 
 
         if cardVerificationData:
-            if self.APIVERSION == '1.0':
-                cv_data = CardVerificationData(**cardVerificationData)
-            if self.APIVERSION == '2.0':
-                cv_data = CardVerificationDataV2(**cardVerificationData)
+            cv_data = CardVerificationDataV2(**cardVerificationData)
             payload["cardVerificationData"] = cv_data.data
 
         return self.make_request("/Payment/VirtualCardPayment", "POST", json=payload)
