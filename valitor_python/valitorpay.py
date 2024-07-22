@@ -11,7 +11,7 @@ from .currencies import ISO4217 as Currency
 
 
 class CardVerificationDataV2(object):
-    def __init__(self, cavv, mdStatus=None, dsTransId=None, eci=None):
+    def __init__(self, cavv, mdStatus=None, dsTransId=None, eci=None, xid=None):
         data = {
             'cavv': cavv,
         }
@@ -21,6 +21,8 @@ class CardVerificationDataV2(object):
             data['dsTransId'] = dsTransId
         if eci:
             data['eci'] = eci
+        if xid:
+            data['xid'] = xid
         self.data = data
 
 
